@@ -324,7 +324,7 @@ input[type=range]{flex:1;accent-color:var(--teal);cursor:pointer}
     </div>
     <div class="cap-warn" id="a-cap-warn">⚠️ Sedan / iRent capacity (4 pax) exceeded for this group size. Switch to Yoxi MPV.</div>
     <div class="fare-display">
-      <div class="fd-item"><strong id="a-fd-fare">—</strong>Round-trip fare (total)</div>
+      <div class="fd-item"><strong id="a-fd-fare">—</strong>Round-trip fare (= one-way × 2)</div>
       <div class="fd-item"><strong id="a-fd-per">—</strong>Per person share</div>
       <div class="fd-item"><strong id="a-fd-var">—</strong>Hotai variable cost</div>
       <div class="fd-item"><strong id="a-fd-y">—</strong>Hotai net from transport</div>
@@ -338,7 +338,7 @@ input[type=range]{flex:1;accent-color:var(--teal);cursor:pointer}
   <div class="card-body">
     <div class="sl-row">
       <div class="sl-label">Distance to destination
-        <span class="sl-hint">One-way km — fare calculated dynamically</span></div>
+        <span class="sl-hint">One-way km — round-trip fare calculated automatically</span></div>
       <input type="range" min="5" max="80" value="40" step="5" id="a-sl-km" oninput="aCalc()">
       <div class="sl-val" id="a-out-km">40 km</div>
     </div>
