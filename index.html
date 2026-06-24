@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ChicTrip 2.0 · Business Model Calculator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B3A5B;--navyD:#0F2540;--gold:#E1A800;--teal:#0D7A7A;
+  --red:#C0392B;--green:#0A7A50;--bg:#F1F4F8;--white:#FFFFFF;
+  --grey:#6B7280;--border:#E2E8F0;--amber:#92400E;
+  --purple:#5B21B6;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',sans-serif;
+  background:var(--bg);color:var(--navy);min-height:100vh;font-size:14px;line-height:1.5}
+
+/* ── TABS ── */
+.tab-bar{display:flex;background:var(--navyD);padding:0 16px;gap:4px;overflow-x:auto}
+.tab-btn{flex:0 0 auto;padding:13px 18px 11px;font-size:12px;font-weight:700;
+  color:rgba(255,255,255,.5);border:none;background:none;cursor:pointer;
+  border-bottom:3px solid transparent;transition:all .18s;white-space:nowrap;letter-spacing:.01em}
+.tab-btn.active{color:#fff;border-bottom-color:var(--gold)}
+.tab-btn:hover:not(.active){color:rgba(255,255,255,.75)}
+
+/* ── BANNER ── */
+.banner{padding:16px 20px 14px}
+.banner-a{background:var(--gold)}
+.banner-b{background:linear-gradient(135deg,#C0392B 0%,#7B1A12 100%)}
+.banner-eyebrow{display:inline-flex;align-items:center;gap:5px;
+  background:rgba(0,0,0,.18);color:#fff;padding:2px 9px;border-radius:20px;
+  font-size:10px;font-weight:700;letter-spacing:.06em;margin-bottom:8px}
+.banner-title{font-size:20px;font-weight:800;color:#fff;margin-bottom:3px;letter-spacing:-.01em}
+.banner-dates{font-size:13px;color:rgba(255,255,255,.85);font-weight:600;margin-bottom:6px}
+.banner-bonus{display:flex;gap:6px;flex-wrap:wrap}
+.b-chip{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;
+  background:rgba(255,255,255,.25);color:#fff}
+
+/* ── SCENARIO TEXT ── */
+.scenario{background:var(--navyD);padding:13px 20px}
+.sc-label{font-size:10px;font-weight:700;color:var(--gold);
+  letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
+.sc-text{font-size:13px;color:rgba(255,255,255,.82);line-height:1.6}
+.sc-text strong{color:#fff}
+.sc-note{margin-top:6px;font-size:11px;color:rgba(255,255,255,.5);
+  padding:5px 10px;border-left:2px solid var(--gold);background:rgba(255,255,255,.05)}
+
+/* ── STICKY SUMMARY BAR ── */
+.sum-bar{position:sticky;top:0;background:var(--navy);
+  display:flex;padding:10px 16px;gap:4px;z-index:20;
+  box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.sum-item{flex:1;text-align:center;padding:2px 3px;min-width:0}
+.sum-label{font-size:9px;color:rgba(255,255,255,.5);
+  text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sum-val{font-size:17px;font-weight:800;color:#fff;white-space:nowrap}
+.sum-val.gold{color:var(--gold)}
+.sum-val.sky{color:#93C5FD}
+.sum-val.mint{color:#6EE7B7}
+.sum-val.red{color:#FCA5A5}
+.sum-val.lilac{color:#C4B5FD}
+.sum-divider{width:1px;background:rgba(255,255,255,.15);align-self:stretch}
+
+/* ── CONTAINER ── */
+.wrap{max-width:700px;margin:0 auto;padding:14px 14px 40px}
+
+/* ── CARD ── */
+.card{background:var(--white);border-radius:12px;
+  border:1px solid var(--border);margin-bottom:12px;overflow:hidden}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--border)}
+.card-head h3{font-size:11px;font-weight:700;color:var(--grey);
+  text-transform:uppercase;letter-spacing:.06em}
+.card-body{padding:14px 16px}
+
+/* ── TRANSPORT CARDS ── */
+.t-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.t-card{border:2px solid var(--border);border-radius:10px;
+  padding:12px 8px;cursor:pointer;text-align:center;transition:all .15s;user-select:none}
+.t-card:hover{border-color:var(--teal);background:#F0FAFA}
+.t-card.active{border-color:var(--teal);background:#E8F6F6}
+.t-icon{font-size:26px;margin-bottom:4px}
+.t-name{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.t-sub{font-size:10px;color:var(--grey);margin-bottom:4px}
+.t-bonus{font-size:11px;font-weight:700;color:var(--teal)}
+.t-fare{font-size:10px;color:var(--grey);margin-top:3px}
+.t-card.active .t-name{color:var(--teal)}
+.cap-warn{display:none;font-size:11px;color:var(--red);
+  margin-top:8px;padding:6px 10px;background:#FEF2F2;border-radius:6px}
+
+/* ── SLIDERS ── */
+.sl-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sl-label{font-size:13px;color:var(--navy);min-width:155px;flex-shrink:0}
+.sl-hint{display:block;font-size:10px;color:var(--grey);margin-top:1px}
+input[type=range]{flex:1;accent-color:var(--teal);cursor:pointer}
+.sl-val{font-size:14px;font-weight:700;color:var(--navy);min-width:60px;text-align:right}
+
+/* ── BONUS STRIP ── */
+.bonus-strip{background:#F0FDF4;border:1px solid #BBF7D0;
+  border-radius:8px;padding:10px 13px;margin-top:4px}
+.bonus-strip-label{font-size:10px;font-weight:700;color:#065F46;
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.bonus-eq{display:flex;align-items:center;flex-wrap:wrap;gap:5px}
+.bchip{padding:3px 9px;border-radius:4px;font-size:12px;font-weight:700}
+.bchip-base{background:#E5E7EB;color:#374151}
+.bchip-yoxi{background:#DBEAFE;color:#1E40AF}
+.bchip-irent{background:#EDE9FE;color:#5B21B6}
+.bchip-fest{background:#FEF3C7;color:#92400E}
+.bchip-none{background:#F3F4F6;color:#6B7280}
+.bonus-result{font-size:17px;font-weight:800;color:#065F46}
+.bonus-op{color:#9CA3AF;font-size:13px}
+
+/* ── FARE DISPLAY ── */
+.fare-display{background:#F0FAFA;border:1px solid #99E6E6;
+  border-radius:8px;padding:8px 13px;margin-top:8px;
+  display:flex;gap:12px;flex-wrap:wrap}
+.fd-item{font-size:11px;color:var(--grey)}
+.fd-item strong{color:var(--teal);font-size:13px;display:block}
+
+/* ══════════════════════════════════════
+   THREE-PARTY CARDS — GIVE / GET LAYOUT
+══════════════════════════════════════ */
+.party-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.p-card{border-radius:10px;overflow:hidden;border:1px solid var(--border);
+  display:flex;flex-direction:column}
+
+/* Card header */
+.p-head{padding:10px 12px}
+.p-role{font-size:9px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:2px;opacity:.7}
+.p-name{font-size:13px;font-weight:700}
+
+/* Section label inside card body */
+.p-section{padding:5px 12px 3px;font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;
+  display:flex;align-items:center;gap:5px}
+.p-section-give{background:#FEF2F2;color:#991B1B}
+.p-section-get{background:#F0FDF4;color:#065F46}
+
+/* Row within section */
+.p-body{background:var(--white)}
+.pr{display:flex;justify-content:space-between;align-items:baseline;
+  padding:4px 12px;font-size:11.5px;border-bottom:.5px solid #F9FAFB}
+.pr:last-of-type{border-bottom:none}
+.pr-label{color:var(--grey);flex:1;min-width:0}
+.pr-neg{color:var(--red);font-weight:700;white-space:nowrap}
+.pr-pos{color:var(--green);font-weight:700;white-space:nowrap}
+.pr-neu{color:var(--navy);font-weight:700;white-space:nowrap}
+.pr-dim{color:#9CA3AF;white-space:nowrap}
+.pr-sub{color:var(--grey);font-size:10px;display:block;margin-top:1px}
+
+/* Subtotal row */
+.pr-subtotal{background:#F9FAFB;font-weight:700;border-top:.5px solid var(--border)!important}
+
+/* Net result box */
+.p-net{padding:8px 12px;margin:8px 8px;border-radius:8px;text-align:center}
+.p-net-label{font-size:9px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;opacity:.75;margin-bottom:3px}
+.p-net-val{font-size:20px;font-weight:800}
+
+/* Saving callout — host only */
+.p-saving{margin:0 8px 8px;padding:6px 10px;border-radius:6px;
+  background:#FEF3C7;border:1px solid #FDE68A;
+  font-size:10px;color:#92400E;line-height:1.5}
+.p-saving strong{color:#78350F}
+
+/* Insight */
+.p-insight{font-size:10px;color:var(--grey);font-style:italic;
+  margin:0 12px 10px;line-height:1.5;padding-top:6px;
+  border-top:.5px solid var(--border)}
+
+/* Color themes */
+.p-host .p-head{background:#FFFBEB}
+.p-host .p-role{color:#92400E}
+.p-host .p-name{color:#78350F}
+.p-host .p-net{background:#FFFBEB}
+.p-host .p-net-label{color:#92400E}
+.p-host .p-net-val{color:#78350F}
+
+.p-traveller .p-head{background:#F0FAFA}
+.p-traveller .p-role{color:#0D7A7A}
+.p-traveller .p-name{color:#064E3B}
+.p-traveller .p-net{background:#F0FAFA}
+.p-traveller .p-net-label{color:#0D7A7A}
+.p-traveller .p-net-val{color:#064E3B}
+
+.p-hotai .p-head{background:#EFF6FF}
+.p-hotai .p-role{color:#1E40AF}
+.p-hotai .p-name{color:#1E3A8A}
+.p-hotai .p-net{background:#EFF6FF}
+.p-hotai .p-net-label{color:#1E40AF}
+.p-hotai .p-net-val{color:#1E3A8A}
+.p-hotai .p-net-val.pos{color:#065F46}
+.p-hotai .p-net-val.neg{color:#991B1B}
+
+/* ── MONEY FLOW ── */
+.flow-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.fl-item{text-align:center;padding:11px 6px;
+  background:#F9FAFB;border-radius:8px;border:1px solid var(--border)}
+.fl-icon{font-size:20px;margin-bottom:4px}
+.fl-amt{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.fl-label{font-size:10px;color:var(--grey);line-height:1.4}
+.fl-note{font-size:11px;color:var(--grey);line-height:1.5;
+  margin-top:8px;padding:8px 10px;background:#FFFBEB;
+  border-radius:7px;border:1px solid #FDE68A}
+
+/* ── BANQUET YOXI STRIP ── */
+.yoxi-strip{background:#EFF6FF;border:1px solid #BFDBFE;
+  border-radius:8px;padding:10px 13px;margin-top:4px}
+.yoxi-strip-label{font-size:10px;font-weight:700;color:#1E40AF;
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.yoxi-eq{font-size:12px;color:#1E3A8A;line-height:1.7}
+.yoxi-hl{font-weight:700;color:#1E40AF}
+
+/* ── EXPLAINER ── */
+.explainer{background:#F8FAFC;border-radius:8px;padding:12px 14px;margin-top:10px}
+.explainer p{font-size:12px;color:#374151;line-height:1.65;margin-bottom:7px}
+.explainer p:last-child{margin-bottom:0}
+.explainer .exhl{color:var(--navy);font-weight:700}
+.explainer .note{border-left:3px solid var(--teal);padding-left:10px;color:var(--teal)}
+
+/* ── FOOTER ── */
+.footer{text-align:center;padding:24px 16px 8px;font-size:11px;color:var(--grey)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:520px){
+  .t-grid{grid-template-columns:1fr}
+  .t-card{display:flex;align-items:center;gap:12px;text-align:left;padding:10px 12px}
+  .t-icon{font-size:22px;flex-shrink:0}
+  .party-grid{grid-template-columns:1fr}
+  .flow-grid{grid-template-columns:repeat(2,1fr)}
+  .sum-val{font-size:15px}
+  .wrap{padding:10px 10px 40px}
+
+  /* Slider: label full-width on top, range + value on bottom row */
+  .sl-row{flex-wrap:wrap;gap:4px 8px;margin-bottom:14px}
+  .sl-label{min-width:100%;flex-shrink:1;font-size:12px}
+  .sl-hint{font-size:9px}
+  input[type=range]{flex:1;min-width:0}
+  .sl-val{font-size:13px;min-width:52px;text-align:right;flex-shrink:0}
+}
+</style>
+</head>
+<body>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('a')">🥭 Scenario A — Mango Day Trip</button>
+  <button class="tab-btn" onclick="switchTab('b')">🍽️ Scenario B — Banquet Table</button>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SCENARIO A
+════════════════════════════════════════════ -->
+<div id="tab-a">
+
+<div class="banner banner-a">
+  <div class="banner-eyebrow">🥭 SYSTEM FEATURED ACTIVITY</div>
+  <div class="banner-title">Mango Season · 玉井芒果季</div>
+  <div class="banner-dates">6 / 15 – 7 / 31, 2025 &nbsp;·&nbsp; Tainan city centre → Yuching</div>
+  <div class="banner-bonus">
+    <span class="b-chip">🚗 Yoxi ride +50% pts</span>
+    <span class="b-chip">🔑 iRent +20% pts</span>
+    <span class="b-chip">🥭 Festival season +20% pts</span>
+    <span class="b-chip" id="a-b-combined">Combined → B = 1.70</span>
+  </div>
+</div>
+
+<div class="scenario">
+  <div class="sc-label">Scenario</div>
+  <div class="sc-text">
+    <strong>1 Taiwanese host + <span id="a-sc-n">2</span> foreign travellers</strong>, strangers matched through ChicTrip.
+    Meet at <strong>南門公園 Nanmen Park</strong>, Tainan → take transport together to Yuching (<span id="a-sc-km">40</span> km away).
+  </div>
+  <div class="sc-note">
+    🛒 Food, drinks, souvenirs &amp; entrance fees in Yuching are paid <strong>directly and individually</strong> — only matching fee and transport are calculated here.
+  </div>
+</div>
+
+<div class="sum-bar">
+  <div class="sum-item">
+    <div class="sum-label">Host earns</div>
+    <div class="sum-val gold" id="a-s-host">— pts</div>
+  </div>
+  <div class="sum-divider"></div>
+  <div class="sum-item">
+    <div class="sum-label">Each traveller</div>
+    <div class="sum-val sky" id="a-s-guest">— pts</div>
+  </div>
+  <div class="sum-divider"></div>
+  <div class="sum-item">
+    <div class="sum-label">Hotai net benefit</div>
+    <div class="sum-val mint" id="a-s-nb">—</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- TRANSPORT MODE -->
+<div class="card">
+  <div class="card-head"><h3>Transport mode — Nanmen Park → Yuching</h3></div>
+  <div class="card-body">
+    <div class="t-grid">
+      <div class="t-card active" id="a-tc-sedan" onclick="aSetTransport('sedan')">
+        <div class="t-icon">🚗</div>
+        <div class="t-name">Yoxi 轎車 Sedan</div>
+        <div class="t-sub">≤ 4 passengers · Hotai-operated</div>
+        <div class="t-bonus">Transport bonus +50%</div>
+        <div class="t-fare" id="a-fare-sedan">—</div>
+      </div>
+      <div class="t-card" id="a-tc-mpv" onclick="aSetTransport('mpv')">
+        <div class="t-icon">🚐</div>
+        <div class="t-name">Yoxi 廂型車 MPV</div>
+        <div class="t-sub">≤ 7 passengers · Hotai-operated</div>
+        <div class="t-bonus">Transport bonus +50%</div>
+        <div class="t-fare" id="a-fare-mpv">—</div>
+      </div>
+      <div class="t-card" id="a-tc-irent" onclick="aSetTransport('irent')">
+        <div class="t-icon">🔑</div>
+        <div class="t-name">iRent + 主揪自駕</div>
+        <div class="t-sub">Host rents &amp; drives · ≤ 4 pax · Hotai-owned</div>
+        <div class="t-bonus">Transport bonus +20%</div>
+        <div class="t-fare" id="a-fare-irent">—</div>
+      </div>
+    </div>
+    <div class="cap-warn" id="a-cap-warn">⚠️ Sedan / iRent capacity (4 pax) exceeded for this group size. Switch to Yoxi MPV.</div>
+    <div class="fare-display">
+      <div class="fd-item"><strong id="a-fd-fare">—</strong>Round-trip fare (total)</div>
+      <div class="fd-item"><strong id="a-fd-per">—</strong>Per person share</div>
+      <div class="fd-item"><strong id="a-fd-var">—</strong>Hotai variable cost</div>
+      <div class="fd-item"><strong id="a-fd-y">—</strong>Hotai net from transport</div>
+    </div>
+  </div>
+</div>
+
+<!-- PARAMETERS A -->
+<div class="card">
+  <div class="card-head"><h3>Parameters — adjust to match your scenario</h3></div>
+  <div class="card-body">
+    <div class="sl-row">
+      <div class="sl-label">Distance to destination
+        <span class="sl-hint">One-way km — fare calculated dynamically</span></div>
+      <input type="range" min="5" max="80" value="40" step="5" id="a-sl-km" oninput="aCalc()">
+      <div class="sl-val" id="a-out-km">40 km</div>
+    </div>
+    <div class="sl-row">
+      <div class="sl-label">Foreign travellers (n)
+        <span class="sl-hint">Matching fee: NT$<span id="a-F-hint">50</span> × n</span></div>
+      <input type="range" min="1" max="6" value="2" step="1" id="a-sl-n" oninput="aCalc()">
+      <div class="sl-val" id="a-out-n">2</div>
+    </div>
+    <div class="sl-row">
+      <div class="sl-label">Matching fee per person (F)
+        <span class="sl-hint">Charged to each traveller (host exempt)</span></div>
+      <input type="range" min="0" max="300" value="50" step="10" id="a-sl-F" oninput="aCalc()">
+      <div class="sl-val" id="a-out-F">NT$50</div>
+    </div>
+    <div class="sl-row">
+      <div class="sl-label">Activity hours (h)
+        <span class="sl-hint">Affects host points only — NOT the fee</span></div>
+      <input type="range" min="1" max="5" value="3" step="0.5" id="a-sl-h" oninput="aCalc()">
+      <div class="sl-val" id="a-out-h">3.0 hr</div>
+    </div>
+    <div class="sl-row">
+      <div class="sl-label">c — Hotai cost / pt
+        <span class="sl-hint">Redemption liability + platform overhead</span></div>
+      <input type="range" min="0.20" max="0.90" value="0.50" step="0.05" id="a-sl-c" oninput="aCalc()">
+      <div class="sl-val" id="a-out-c">0.50</div>
+    </div>
+    <div class="sl-row">
+      <div class="sl-label">Platform ops / activity
+        <span class="sl-hint">Server, support, overhead (NT$)</span></div>
+      <input type="range" min="20" max="200" value="50" step="10" id="a-sl-ops" oninput="aCalc()">
+      <div class="sl-val" id="a-out-ops">NT$50</div>
+    </div>
+    <div class="bonus-strip">
+      <div class="bonus-strip-label">Live bonus multiplier</div>
+      <div class="bonus-eq">
+        <span class="bchip bchip-base">1 base</span>
+        <span class="bonus-op">+</span>
+        <span class="bchip" id="a-bchip-t">Yoxi +50%</span>
+        <span class="bonus-op">+</span>
+        <span class="bchip bchip-fest">Mango season +20%</span>
+        <span class="bonus-op">=</span>
+        <span class="bonus-result" id="a-b-val">B = 1.70</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- THREE-PARTY — SCENARIO A -->
+<div class="card">
+  <div class="card-head"><h3>Who gives what · Who gets what</h3></div>
+  <div class="card-body">
+    <div class="party-grid">
+
+      <!-- HOST -->
+      <div class="p-card p-host">
+        <div class="p-head">
+          <div class="p-role">主揪 · Taiwanese host</div>
+          <div class="p-name">1 person</div>
+        </div>
+        <div class="p-body">
+          <div class="p-section p-section-give">↑ GIVES</div>
+          <div class="pr"><span class="pr-label">Matching fee</span><span class="pr-dim">NT$0</span></div>
+          <div class="pr"><span class="pr-label">Transport share
+            <span class="pr-sub">1/<span id="a-h-pax">3</span> of round-trip fare</span>
+          </span><span class="pr-neg" id="a-h-tr">—</span></div>
+          <div class="pr pr-subtotal"><span class="pr-label">Total paid</span><span class="pr-neu" id="a-h-tot">—</span></div>
+          <div class="p-section p-section-get">↓ GETS</div>
+          <div class="pr"><span class="pr-label">Points earned
+            <span class="pr-sub" id="a-h-pts-formula">30 pts/hr × h × B</span>
+          </span><span class="pr-pos" id="a-h-pts">—</span></div>
+          <div class="pr"><span class="pr-label">Points value (≈ NT$1/pt)</span><span class="pr-pos" id="a-h-val">—</span></div>
+          <div class="pr"><span class="pr-label">Transport companions</span><span class="pr-pos" id="a-h-companions">2 travellers</span></div>
+        </div>
+        <div class="p-saving" id="a-h-saving">
+          Solo trip would cost <strong id="a-h-solo">—</strong> — with ChicTrip, host shares the ride and pays <strong id="a-h-share">—</strong>, saving <strong id="a-h-saved">—</strong>.
+        </div>
+        <div class="p-net">
+          <div class="p-net-label">Net out-of-pocket (after points)</div>
+          <div class="p-net-val" id="a-h-net">—</div>
+        </div>
+      </div>
+
+      <!-- TRAVELLER -->
+      <div class="p-card p-traveller">
+        <div class="p-head">
+          <div class="p-role">外籍遊客 · Each traveller</div>
+          <div class="p-name" id="a-t-count">× 2 persons</div>
+        </div>
+        <div class="p-body">
+          <div class="p-section p-section-give">↑ GIVES</div>
+          <div class="pr"><span class="pr-label">Matching fee
+            <span class="pr-sub">platform charge</span>
+          </span><span class="pr-neg" id="a-t-fee-disp">–NT$50</span></div>
+          <div class="pr"><span class="pr-label">Transport share
+            <span class="pr-sub">1/<span id="a-t-pax">3</span> of round-trip fare</span>
+          </span><span class="pr-neg" id="a-t-tr">—</span></div>
+          <div class="pr pr-subtotal"><span class="pr-label">Total paid</span><span class="pr-neu" id="a-t-tot">—</span></div>
+          <div class="p-section p-section-get">↓ GETS</div>
+          <div class="pr"><span class="pr-label">Points earned
+            <span class="pr-sub" id="a-t-pts-formula">50 pts × B</span>
+          </span><span class="pr-pos" id="a-t-pts">—</span></div>
+          <div class="pr"><span class="pr-label">Points value (≈ NT$1/pt)</span><span class="pr-pos" id="a-t-val">—</span></div>
+          <div class="pr"><span class="pr-label">In-language local guide</span><span class="pr-pos">✓ included</span></div>
+          <div class="pr"><span class="pr-label">Round-trip transport</span><span class="pr-pos">✓ arranged</span></div>
+        </div>
+        <div class="p-net">
+          <div class="p-net-label">Net out-of-pocket (after points)</div>
+          <div class="p-net-val" id="a-t-net">—</div>
+        </div>
+        <div class="p-insight">NT$<span id="a-t-net-plain">—</span> for a local who speaks your language, knows the best spots, and takes care of transport logistics.</div>
+      </div>
+
+      <!-- HOTAI -->
+      <div class="p-card p-hotai">
+        <div class="p-head">
+          <div class="p-role">和泰 · Hotai ecosystem</div>
+          <div class="p-name">ChicTrip + Yoxi / iRent</div>
+        </div>
+        <div class="p-body">
+          <div class="p-section p-section-get">↓ RECEIVES</div>
+          <div class="pr"><span class="pr-label">Matching fees
+            <span class="pr-sub">NT$<span id="a-ho-F-label">50</span> × <span id="a-ho-n">2</span> travellers</span>
+          </span><span class="pr-pos" id="a-ho-fees">—</span></div>
+          <div class="pr"><span class="pr-label">Transport fare (full)
+            <span class="pr-sub">NT$<span id="a-ho-per">—</span>/person × <span id="a-ho-pax">3</span> people</span>
+          </span><span class="pr-pos" id="a-ho-fare-total">—</span></div>
+          <div class="pr pr-subtotal"><span class="pr-label">Gross collected</span><span class="pr-pos" id="a-ho-gross-collected">—</span></div>
+          <div class="p-section p-section-give">↑ SPENDS</div>
+          <div class="pr"><span class="pr-label">Vehicle variable cost
+            <span class="pr-sub">driver, fuel, depreciation</span>
+          </span><span class="pr-neg" id="a-ho-var">—</span></div>
+          <div class="pr"><span class="pr-label">Points issued (<span id="a-ho-T">—</span> pts × c)
+          </span><span class="pr-neg" id="a-ho-pc">—</span></div>
+          <div class="pr"><span class="pr-label">Platform ops</span><span class="pr-neg" id="a-ho-ops">—</span></div>
+        </div>
+        <div class="p-net">
+          <div class="p-net-label">Net benefit / activity</div>
+          <div class="p-net-val pos" id="a-ho-nb">—</div>
+        </div>
+        <div class="p-insight">An otherwise-underutilised Yoxi now carries <span id="a-ho-pax2">3</span> passengers — fixed costs recovered across the group.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MONEY FLOW A -->
+<div class="card">
+  <div class="card-head"><h3>Where does the group's money go?</h3></div>
+  <div class="card-body">
+    <div class="flow-grid">
+      <div class="fl-item">
+        <div class="fl-icon">📱</div>
+        <div class="fl-amt" id="a-fl-fees">—</div>
+        <div class="fl-label">ChicTrip matching fees</div>
+      </div>
+      <div class="fl-item">
+        <div class="fl-icon">🚗</div>
+        <div class="fl-amt" id="a-fl-fare">—</div>
+        <div class="fl-label">Yoxi / iRent fare to Hotai</div>
+      </div>
+      <div class="fl-item" style="background:#FFF7ED;border-color:#FDE68A">
+        <div class="fl-icon">⛽</div>
+        <div class="fl-amt" id="a-fl-fuel">—</div>
+        <div class="fl-label">Fuel (iRent only, to gas station)</div>
+      </div>
+      <div class="fl-item" style="background:#F0FDF4;border-color:#BBF7D0">
+        <div class="fl-icon">⭐</div>
+        <div class="fl-amt" style="color:#065F46" id="a-fl-pts">—</div>
+        <div class="fl-label">Points loop back into Hotai</div>
+      </div>
+    </div>
+    <div class="fl-note">🛒 Food, souvenirs, and entrance fees are paid <strong>directly at each vendor</strong> — they flow straight into the Yuching local economy, not ChicTrip.</div>
+  </div>
+</div>
+
+<!-- MODEL NOTES A -->
+<div class="card">
+  <div class="card-head"><h3>Model notes</h3></div>
+  <div class="card-body">
+    <div class="explainer">
+      <p><span class="exhl">Dynamic fare model.</span> Fares calculated from base + per-km rates (round-trip × 2):
+      <br>• Yoxi Sedan: NT$120 base + NT$22/km &nbsp;·&nbsp; Yoxi MPV: NT$150 base + NT$28/km
+      <br>• iRent: NT$200 rental base + NT$15/km + NT$3.5/km fuel (round-trip)
+      <br>Hotai variable cost = driver pay, fuel, depreciation (≈ 30% sedan, 27% MPV, 18% iRent rental).</p>
+      <p><span class="exhl">c = Hotai's effective cost to issue 1 Hotai Point.</span> Redemption liability NT$0.30–0.70 (varies by breakage rate) + platform overhead NT$0.05–0.15/pt (shrinks at scale).</p>
+      <p class="note"><strong>Variable costs are NOT in c.</strong> They are already deducted from transport fare to get net Y. Adding them to c again would double-count.</p>
+    </div>
+    <div class="explainer" style="margin-top:8px;border-left:3px solid var(--gold)">
+      <p><span class="exhl">Why Yoxi +50% vs iRent +20%</span></p>
+      <p>Yoxi carries a larger bonus because Hotai operates the full driver network — recovering fixed driver costs directly. iRent is a Hotai-owned self-service fleet where the host drives, so Hotai's marginal contribution is lower. The bonus gap incentivises hosts to prefer Yoxi.</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap A -->
+</div><!-- /tab-a -->
+
+
+<!-- ════════════════════════════════════════════
+     SCENARIO B — BANQUET
+════════════════════════════════════════════ -->
+<div id="tab-b" style="display:none">
+
+<div class="banner banner-b">
+  <div class="banner-eyebrow">🍽️ COMMUNITY ACTIVITY</div>
+  <div class="banner-title">辦桌揪團 · Banquet Table</div>
+  <div class="banner-dates">Zhu-Xin-Ju 筑馨居 · Tainan &nbsp;·&nbsp; Group dining, strangers welcome</div>
+  <div class="banner-bonus">
+    <span class="b-chip">No transport bonus</span>
+    <span class="b-chip">No seasonal promotion</span>
+    <span class="b-chip">B = 1.00 (base only)</span>
+  </div>
+</div>
+
+<div class="scenario">
+  <div class="sc-label">Scenario</div>
+  <div class="sc-text">
+    A Taiwanese host wants to eat <strong>辦桌 (bàn-zhuō) banquet-style</strong> and recruits strangers via ChicTrip to fill the table at <strong>筑馨居 Zhu-Xin-Ju</strong>.
+    Participants make their own way to the restaurant. Meal cost is <strong>self-paid per person at the restaurant</strong>.
+  </div>
+  <div class="sc-note">
+    💡 The host's motivation is genuine — wanting to eat 辦桌. That intrinsic drive makes host supply self-sustaining without subsidy. Yoxi rides to the venue are individual and optional.
+  </div>
+</div>
+
+<div class="sum-bar">
+  <div class="sum-item">
+    <div class="sum-label">Host earns</div>
+    <div class="sum-val gold" id="b-s-host">— pts</div>
+  </div>
+  <div class="sum-divider"></div>
+  <div class="sum-item">
+    <div class="sum-label">Each participant</div>
+    <div class="sum-val lilac" id="b-s-guest">— pts</div>
+  </div>
+  <div class="sum-divider"></div>
+  <div class="sum-item">
+    <div class="sum-label">Hotai net benefit</div>
+    <div class="sum-val mint" id="b-s-nb">—</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- PARAMETERS B -->
+<div class="card">
+  <div class="card-head"><h3>Parameters — banquet table configuration</h3></div>
+  <div class="card-body">
+    <div class="sl-row">
+      <div class="sl-label">Participants (n)
+        <span class="sl-hint">Each pays matching fee NT$<span id="b-F-hint">50</span> (host exempt)</span></div>
+      <input type="range" min="1" max="9" value="5" step="1" id="b-sl-n" oninput="bCalc()">
+      <div class="sl-val" id="b-out-n">5</div>
+    </div>
+    <div class="sl-row">
+      <div class="sl-label">Matching fee per person (F)
+        <span class="sl-hint">Charged to each participant (host exempt)</span></div>
+      <input type="range" min="0" max="300" value="50" step="10" id="b-sl-F" oninput="bCalc()">
+      <div class="sl-val" id="b-out-F">NT$50</div>
+    </div>
+    <div class="sl-row">
+      <div class="sl-label">Activity hours (h)
+        <span class="sl-hint">Banquet duration — affects host points</span></div>
+      <input type="range" min="1" max="4" value="2" step="0.5" id="b-sl-h" oninput="bCalc()">
+      <div class="sl-val" id="b-out-h">2.0 hr</div>
+    </div>
+    <div class="sl-row">
+      <div class="sl-label">c — Hotai cost / pt
+        <span class="sl-hint">Same redemption liability model as Scenario A</span></div>
+      <input type="range" min="0.20" max="0.90" value="0.50" step="0.05" id="b-sl-c" oninput="bCalc()">
+      <div class="sl-val" id="b-out-c">0.50</div>
+    </div>
+    <div class="sl-row">
+      <div class="sl-label">Platform ops / activity
+        <span class="sl-hint">Server, support, overhead (NT$)</span></div>
+      <input type="range" min="20" max="200" value="50" step="10" id="b-sl-ops" oninput="bCalc()">
+      <div class="sl-val" id="b-out-ops">NT$50</div>
+    </div>
+    <div class="bonus-strip" style="background:#FEF2F2;border-color:#FECACA">
+      <div class="bonus-strip-label" style="color:#7B1A12">Live bonus multiplier</div>
+      <div class="bonus-eq">
+        <span class="bchip bchip-base">1 base</span>
+        <span class="bonus-op">+</span>
+        <span class="bchip bchip-none">No transport bonus</span>
+        <span class="bonus-op">+</span>
+        <span class="bchip bchip-none">No seasonal bonus</span>
+        <span class="bonus-op">=</span>
+        <span class="bonus-result" style="color:#7B1A12">B = 1.00</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- YOXI PASSIVE INCOME B -->
+<div class="card">
+  <div class="card-head"><h3>Yoxi passive income — individual rides to venue</h3></div>
+  <div class="card-body">
+    <p style="font-size:12px;color:var(--grey);margin-bottom:12px">
+      Participants choose their own transport. Those who take Yoxi generate additional Hotai revenue independent of the ChicTrip matching flow.
+    </p>
+    <div class="sl-row">
+      <div class="sl-label">Avg. distance to venue
+        <span class="sl-hint">One-way km per Yoxi rider</span></div>
+      <input type="range" min="1" max="20" value="5" step="1" id="b-sl-km" oninput="bCalc()">
+      <div class="sl-val" id="b-out-km">5 km</div>
+    </div>
+    <div class="sl-row">
+      <div class="sl-label">Yoxi ride-share rate
+        <span class="sl-hint">% of participants who take Yoxi</span></div>
+      <input type="range" min="0" max="100" value="40" step="10" id="b-sl-yoxi" oninput="bCalc()">
+      <div class="sl-val" id="b-out-yoxi">40%</div>
+    </div>
+    <div class="yoxi-strip">
+      <div class="yoxi-strip-label">Yoxi revenue calculation</div>
+      <div class="yoxi-eq" id="b-yoxi-eq">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- THREE-PARTY — SCENARIO B -->
+<div class="card">
+  <div class="card-head"><h3>Who gives what · Who gets what</h3></div>
+  <div class="card-body">
+    <div class="party-grid">
+
+      <!-- HOST B -->
+      <div class="p-card p-host">
+        <div class="p-head">
+          <div class="p-role">主揪 · Host organiser</div>
+          <div class="p-name">1 person</div>
+        </div>
+        <div class="p-body">
+          <div class="p-section p-section-give">↑ GIVES</div>
+          <div class="pr"><span class="pr-label">Matching fee</span><span class="pr-dim">NT$0</span></div>
+          <div class="pr"><span class="pr-label">Meal cost
+            <span class="pr-sub">self-paid at restaurant</span>
+          </span><span class="pr-dim">own expense</span></div>
+          <div class="pr pr-subtotal"><span class="pr-label">Total via ChicTrip</span><span class="pr-dim">NT$0</span></div>
+          <div class="p-section p-section-get">↓ GETS</div>
+          <div class="pr"><span class="pr-label">Points earned
+            <span class="pr-sub" id="b-h-pts-formula">30 pts/hr × h × 1.00</span>
+          </span><span class="pr-pos" id="b-h-pts">—</span></div>
+          <div class="pr"><span class="pr-label">Points value (≈ NT$1/pt)</span><span class="pr-pos" id="b-h-val">—</span></div>
+          <div class="pr"><span class="pr-label">Banquet companions</span><span class="pr-pos" id="b-h-companions">5 guests</span></div>
+        </div>
+        <div class="p-net">
+          <div class="p-net-label">Net ChicTrip cost</div>
+          <div class="p-net-val" style="color:#78350F">NT$0</div>
+        </div>
+        <div class="p-insight">Zero platform cost. Earns points for doing what they'd do anyway. This is the self-sustaining supply logic: 辦桌 supply needs no cash subsidy.</div>
+      </div>
+
+      <!-- PARTICIPANT B -->
+      <div class="p-card p-traveller">
+        <div class="p-head">
+          <div class="p-role">參與者 · Each participant</div>
+          <div class="p-name" id="b-t-count">× 5 persons</div>
+        </div>
+        <div class="p-body">
+          <div class="p-section p-section-give">↑ GIVES</div>
+          <div class="pr"><span class="pr-label">Matching fee
+            <span class="pr-sub">platform charge</span>
+          </span><span class="pr-neg" id="b-t-fee-disp">–NT$50</span></div>
+          <div class="pr"><span class="pr-label">Meal cost
+            <span class="pr-sub">self-paid at restaurant</span>
+          </span><span class="pr-dim">own expense</span></div>
+          <div class="pr pr-subtotal"><span class="pr-label">Total via ChicTrip</span><span class="pr-neu" id="b-t-tot">NT$50</span></div>
+          <div class="p-section p-section-get">↓ GETS</div>
+          <div class="pr"><span class="pr-label">Points earned
+            <span class="pr-sub">50 pts × B (1.00)</span>
+          </span><span class="pr-pos" id="b-t-pts">—</span></div>
+          <div class="pr"><span class="pr-label">Points value (≈ NT$1/pt)</span><span class="pr-pos" id="b-t-val">—</span></div>
+          <div class="pr"><span class="pr-label">Authentic banquet access</span><span class="pr-pos">✓ included</span></div>
+        </div>
+        <div class="p-net">
+          <div class="p-net-label">Net out-of-pocket (after points)</div>
+          <div class="p-net-val" id="b-t-net">—</div>
+        </div>
+        <div class="p-insight">NT$50 to join an authentic Taiwanese banquet — hard to find, impossible to plan alone without a local.</div>
+      </div>
+
+      <!-- HOTAI B -->
+      <div class="p-card p-hotai">
+        <div class="p-head">
+          <div class="p-role">和泰 · Hotai ecosystem</div>
+          <div class="p-name">ChicTrip + Yoxi rides</div>
+        </div>
+        <div class="p-body">
+          <div class="p-section p-section-get">↓ RECEIVES</div>
+          <div class="pr"><span class="pr-label">Matching fees
+            <span class="pr-sub">NT$<span id="b-ho-F-label">50</span> × <span id="b-ho-n">5</span> participants</span>
+          </span><span class="pr-pos" id="b-ho-fees">—</span></div>
+          <div class="pr"><span class="pr-label">Yoxi rides (net)
+            <span class="pr-sub"><span id="b-ho-nYoxi">2</span> riders × NT$<span id="b-ho-rideFare">—</span>/ride</span>
+          </span><span class="pr-pos" id="b-ho-y">—</span></div>
+          <div class="pr pr-subtotal"><span class="pr-label">Gross revenue</span><span class="pr-pos" id="b-ho-gross">—</span></div>
+          <div class="p-section p-section-give">↑ SPENDS</div>
+          <div class="pr"><span class="pr-label">Points issued (<span id="b-ho-T">—</span> pts × c)</span><span class="pr-neg" id="b-ho-pc">—</span></div>
+          <div class="pr"><span class="pr-label">Platform ops</span><span class="pr-neg" id="b-ho-ops">—</span></div>
+        </div>
+        <div class="p-net">
+          <div class="p-net-label">Net benefit / activity</div>
+          <div class="p-net-val pos" id="b-ho-nb">—</div>
+        </div>
+        <div class="p-insight">No vehicle dispatch needed. Pure margin on matching + organic Yoxi rides. Zero incremental operational effort per activity.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MONEY FLOW B -->
+<div class="card">
+  <div class="card-head"><h3>Where does the money go?</h3></div>
+  <div class="card-body">
+    <div class="flow-grid">
+      <div class="fl-item">
+        <div class="fl-icon">📱</div>
+        <div class="fl-amt" id="b-fl-fees">—</div>
+        <div class="fl-label">ChicTrip matching fees</div>
+      </div>
+      <div class="fl-item">
+        <div class="fl-icon">🚖</div>
+        <div class="fl-amt" id="b-fl-yoxi">—</div>
+        <div class="fl-label">Yoxi individual rides (net)</div>
+      </div>
+      <div class="fl-item" style="background:#FFF7ED;border-color:#FDE68A">
+        <div class="fl-icon">🍽️</div>
+        <div class="fl-amt" id="b-fl-meal">—</div>
+        <div class="fl-label">Meal cost → restaurant (not ChicTrip)</div>
+      </div>
+      <div class="fl-item" style="background:#F0FDF4;border-color:#BBF7D0">
+        <div class="fl-icon">⭐</div>
+        <div class="fl-amt" style="color:#065F46" id="b-fl-pts">—</div>
+        <div class="fl-label">Points loop back into Hotai</div>
+      </div>
+    </div>
+    <div class="fl-note" style="background:#FEF2F2;border-color:#FECACA;color:#7B1A12">
+      🏮 Banquet meal is paid <strong>directly to Zhu-Xin-Ju</strong> (NT$<span id="b-meal-pp">500</span>/person assumed). ChicTrip is the social matching layer only.
+    </div>
+  </div>
+</div>
+
+<!-- SUPPLY LOGIC NOTE -->
+<div class="card">
+  <div class="card-head"><h3>Why the banquet model matters — supply-side logic</h3></div>
+  <div class="card-body">
+    <div class="explainer" style="border-left:3px solid #C0392B">
+      <p><span class="exhl">Self-sustaining supply.</span> In Scenario A, the host earns points as a reward for effort (hosting, language, logistics). In Scenario B, the host's primary motivation is personal — they genuinely want to eat 辦桌. ChicTrip converts that existing desire into a social event that generates matching fees and Yoxi rides for Hotai.</p>
+      <p><span class="exhl">No subsidy needed.</span> Unlike platform labour models where supply must be incentivised with cash, 辦桌 supply is driven by hunger. Points are a bonus, not the reason. This structurally lowers host acquisition cost to near zero.</p>
+      <p class="note"><strong>Executive framing:</strong> "Scenario B proves ChicTrip can monetise social dining occasions that Klook and Airbnb have no mechanism to capture — activities that begin not with a tourist's demand, but with a local's appetite."</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap B -->
+</div><!-- /tab-b -->
+
+<div class="footer">ChicTrip 2.0 &nbsp;·&nbsp; NCKU ICID UX Research 2026 &nbsp;·&nbsp; All figures are illustrative estimates for executive reference</div>
+
+<script>
+// ══════════════════════════════════════
+// FARE MODEL
+// ══════════════════════════════════════
+function calcFare(mode, km) {
+  const rt = km * 2;
+  let fare = 0, fuel = 0, varCost = 0;
+  if (mode === 'sedan') {
+    fare    = Math.round(120 + 22 * rt);
+    varCost = Math.round(fare * 0.30);
+  } else if (mode === 'mpv') {
+    fare    = Math.round(150 + 28 * rt);
+    varCost = Math.round(fare * 0.27);
+  } else {
+    fare    = Math.round(200 + 15 * rt);
+    fuel    = Math.round(3.5 * rt);
+    varCost = Math.round(fare * 0.18);
+  }
+  return { fare, fuel, varCost, Y: fare - varCost };
+}
+
+function calcYoxiRide(km) {
+  const fare = Math.round(80 + 18 * km);
+  const varCost = Math.round(fare * 0.30);
+  return { fare, net: fare - varCost };
+}
+
+const PH = 30, PG = 50, FEST = 0.20, MEAL_PP = 500;
+
+function $id(id) { return document.getElementById(id); }
+function nt(v)   { return 'NT$' + Math.round(v); }
+
+// ══════════════════════════════════════
+// TAB SWITCH
+// ══════════════════════════════════════
+function switchTab(t) {
+  $id('tab-a').style.display = t === 'a' ? '' : 'none';
+  $id('tab-b').style.display = t === 'b' ? '' : 'none';
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0 && t === 'a') || (i === 1 && t === 'b'));
+  });
+}
+
+// ══════════════════════════════════════
+// SCENARIO A
+// ══════════════════════════════════════
+let aMode = 'sedan';
+
+function aSetTransport(m) {
+  aMode = m;
+  ['sedan','mpv','irent'].forEach(k => {
+    $id('a-tc-'+k).classList.toggle('active', k === m);
+  });
+  aCalc();
+}
+
+function aCalc() {
+  const n   = +$id('a-sl-n').value;
+  const h   = +$id('a-sl-h').value;
+  const c   = +$id('a-sl-c').value;
+  const ops = +$id('a-sl-ops').value;
+  const km  = +$id('a-sl-km').value;
+  const { fare, fuel, varCost, Y } = calcFare(aMode, km);
+  const totalPax = n + 1;
+  const maxPax   = aMode === 'mpv' ? 7 : 4;
+  const perPerson = Math.round((fare + fuel) / totalPax);
+
+  const F  = +$id('a-sl-F').value;
+  // Slider labels
+  $id('a-out-F').textContent   = 'NT$' + F;
+  $id('a-F-hint').textContent  = F;
+  $id('a-out-n').textContent   = n;
+  $id('a-out-h').textContent   = h.toFixed(1) + ' hr';
+  $id('a-out-c').textContent   = c.toFixed(2);
+  $id('a-out-ops').textContent = nt(ops);
+  $id('a-out-km').textContent  = km + ' km';
+  $id('a-sc-n').textContent    = n;
+  $id('a-sc-km').textContent   = km;
+
+  // Transport card fare labels
+  $id('a-fare-sedan').textContent = 'RT: ' + nt(calcFare('sedan',km).fare);
+  $id('a-fare-mpv').textContent   = 'RT: ' + nt(calcFare('mpv',km).fare);
+  const fi = calcFare('irent',km);
+  $id('a-fare-irent').textContent = 'RT rental: ' + nt(fi.fare) + ' + fuel: ' + nt(fi.fuel);
+
+  // Fare strip
+  $id('a-fd-fare').textContent = nt(fare + fuel);
+  $id('a-fd-per').textContent  = nt(perPerson) + '/person';
+  $id('a-fd-var').textContent  = nt(varCost);
+  $id('a-fd-y').textContent    = nt(Y);
+
+  // Capacity warning
+  $id('a-cap-warn').style.display = (totalPax > maxPax && aMode !== 'mpv') ? 'block' : 'none';
+
+  // Bonus
+  const tBonus = (aMode === 'irent') ? 0.20 : 0.50;
+  const B = parseFloat((1 + tBonus + FEST).toFixed(2));
+  const chip = $id('a-bchip-t');
+  chip.textContent = (aMode === 'irent') ? 'iRent +20%' : 'Yoxi +50%';
+  chip.className   = 'bchip ' + (aMode === 'irent' ? 'bchip-irent' : 'bchip-yoxi');
+  $id('a-b-val').textContent       = 'B = ' + B.toFixed(2);
+  $id('a-b-combined').textContent  = 'Combined → B = ' + B.toFixed(2);
+
+  // Points
+  const hostBase = Math.round(PH * h);
+  const hostPts  = Math.round(hostBase * B);
+  const guestPts = Math.round(PG * B);
+  const T = hostPts + n * guestPts;
+  const fees     = n * F;
+  const ptsCost  = Math.round(T * c);
+  const nb = fees + Y - ptsCost - ops;
+
+  // HOST card
+  const soloFare = fare + fuel; // full fare if host went alone
+  const hostSaving = soloFare - perPerson;
+  $id('a-h-pax').textContent       = totalPax;
+  $id('a-h-tr').textContent        = '–' + nt(perPerson);
+  $id('a-h-tot').textContent       = nt(perPerson);
+  $id('a-h-pts-formula').textContent = '30 pts/hr × ' + h.toFixed(1) + 'h × B' + B.toFixed(2);
+  $id('a-h-pts').textContent       = hostPts + ' pts';
+  $id('a-h-val').textContent       = nt(hostPts);
+  $id('a-h-companions').textContent = n + ' traveller' + (n>1?'s':'');
+  $id('a-h-solo').textContent      = nt(soloFare);
+  $id('a-h-share').textContent     = nt(perPerson);
+  $id('a-h-saved').textContent     = nt(hostSaving);
+  $id('a-h-net').textContent       = nt(Math.max(0, perPerson - hostPts));
+
+  // TRAVELLER card
+  const tTot = F + perPerson;
+  const tNet = Math.max(0, tTot - guestPts);
+  $id('a-t-count').textContent       = '× ' + n + ' person' + (n>1?'s':'');
+  $id('a-t-pax').textContent         = totalPax;
+  $id('a-t-fee-disp').textContent    = '–' + nt(F);
+  $id('a-t-tr').textContent          = '–' + nt(perPerson);
+  $id('a-t-tot').textContent         = nt(tTot);
+  $id('a-t-pts-formula').textContent = '50 pts × B' + B.toFixed(2);
+  $id('a-t-pts').textContent         = guestPts + ' pts';
+  $id('a-t-val').textContent         = nt(guestPts);
+  $id('a-t-net').textContent         = nt(tNet);
+  $id('a-t-net-plain').textContent   = Math.round(tNet);
+
+  // HOTAI card
+  const grossCollected = fees + (fare + fuel); // all cash received from group
+  const nbEl = $id('a-ho-nb');
+  $id('a-ho-n').textContent          = n;
+  $id('a-ho-per').textContent        = Math.round(perPerson);
+  $id('a-ho-pax').textContent        = totalPax;
+  $id('a-ho-pax2').textContent       = totalPax;
+  $id('a-ho-F-label').textContent    = F;
+  $id('a-ho-fees').textContent       = '+' + nt(fees);
+  $id('a-ho-fare-total').textContent = '+' + nt(fare + fuel);
+  $id('a-ho-gross-collected').textContent = nt(grossCollected);
+  $id('a-ho-var').textContent        = '–' + nt(varCost);
+  $id('a-ho-T').textContent          = T;
+  $id('a-ho-pc').textContent         = '–' + nt(ptsCost);
+  $id('a-ho-ops').textContent        = '–' + nt(ops);
+  nbEl.textContent  = (nb >= 0 ? '+' : '') + nt(nb);
+  nbEl.className    = 'p-net-val ' + (nb >= 0 ? 'pos' : 'neg');
+
+  // Summary bar
+  $id('a-s-host').textContent  = hostPts + ' pts';
+  $id('a-s-guest').textContent = guestPts + ' pts';
+  const snb = $id('a-s-nb');
+  snb.textContent = (nb >= 0 ? '+' : '') + nt(nb);
+  snb.className   = 'sum-val ' + (nb >= 0 ? 'mint' : 'red');
+
+  // Money flow
+  $id('a-fl-fees').textContent = nt(fees);
+  $id('a-fl-fare').textContent = nt(fare);
+  $id('a-fl-fuel').textContent = nt(fuel);
+  $id('a-fl-pts').textContent  = T + ' pts';
+}
+
+// ══════════════════════════════════════
+// SCENARIO B — BANQUET
+// ══════════════════════════════════════
+function bCalc() {
+  const n    = +$id('b-sl-n').value;
+  const h    = +$id('b-sl-h').value;
+  const c    = +$id('b-sl-c').value;
+  const ops  = +$id('b-sl-ops').value;
+  const km   = +$id('b-sl-km').value;
+  const yoxi = +$id('b-sl-yoxi').value / 100;
+
+  const F  = +$id('b-sl-F').value;
+  $id('b-out-F').textContent   = 'NT$' + F;
+  $id('b-F-hint').textContent  = F;
+  $id('b-out-n').textContent    = n;
+  $id('b-out-h').textContent    = h.toFixed(1) + ' hr';
+  $id('b-out-c').textContent    = c.toFixed(2);
+  $id('b-out-ops').textContent  = nt(ops);
+  $id('b-out-km').textContent   = km + ' km';
+  $id('b-out-yoxi').textContent = Math.round(yoxi * 100) + '%';
+
+  // Points (B=1.00)
+  const hostPts  = Math.round(PH * h);
+  const guestPts = 50;
+  const T = hostPts + n * guestPts;
+
+  // Yoxi rides
+  const nYoxi = Math.round(n * yoxi);
+  const { fare: yFare, net: yNet } = calcYoxiRide(km);
+  const yoxiNetTotal = nYoxi * yNet;
+
+  $id('b-yoxi-eq').innerHTML =
+    '<span class="yoxi-hl">' + nYoxi + ' rider' + (nYoxi !== 1 ? 's' : '') + '</span>' +
+    ' × ' + nt(yFare) + '/ride (one-way) = ' + nt(nYoxi * yFare) + ' gross → ' +
+    '<span class="yoxi-hl">' + nt(yoxiNetTotal) + ' net</span> to Hotai';
+
+  const fees    = n * F;
+  const gross   = fees + yoxiNetTotal;
+  const ptsCost = Math.round(T * c);
+  const nb      = gross - ptsCost - ops;
+  const tNet    = Math.max(0, F - guestPts);
+
+  // HOST
+  $id('b-h-pts-formula').textContent = '30 pts/hr × ' + h.toFixed(1) + 'h × 1.00';
+  $id('b-h-pts').textContent         = hostPts + ' pts';
+  $id('b-h-val').textContent         = nt(hostPts);
+  $id('b-h-companions').textContent  = n + ' guest' + (n>1?'s':'');
+
+  // PARTICIPANT
+  $id('b-t-count').textContent = '× ' + n + ' person' + (n>1?'s':'');
+  $id('b-t-pts').textContent   = guestPts + ' pts';
+  $id('b-t-val').textContent   = nt(guestPts);
+  $id('b-t-net').textContent   = nt(tNet);
+
+  // HOTAI
+  const nbEl = $id('b-ho-nb');
+  $id('b-ho-n').textContent        = n;
+  $id('b-ho-nYoxi').textContent    = nYoxi;
+  $id('b-ho-rideFare').textContent = Math.round(yNet); // net per ride shown
+  $id('b-ho-F-label').textContent  = F;
+  $id('b-t-fee-disp').textContent   = '–' + nt(F);
+  $id('b-t-tot').textContent        = nt(F);
+  $id('b-ho-fees').textContent     = '+' + nt(fees);
+  $id('b-ho-y').textContent        = '+' + nt(yoxiNetTotal);
+  $id('b-ho-gross').textContent    = nt(gross);
+  $id('b-ho-T').textContent        = T;
+  $id('b-ho-pc').textContent       = '–' + nt(ptsCost);
+  $id('b-ho-ops').textContent      = '–' + nt(ops);
+  nbEl.textContent  = (nb >= 0 ? '+' : '') + nt(nb);
+  nbEl.className    = 'p-net-val ' + (nb >= 0 ? 'pos' : 'neg');
+
+  // Summary bar
+  $id('b-s-host').textContent  = hostPts + ' pts';
+  $id('b-s-guest').textContent = guestPts + ' pts';
+  const snb = $id('b-s-nb');
+  snb.textContent = (nb >= 0 ? '+' : '') + nt(nb);
+  snb.className   = 'sum-val ' + (nb >= 0 ? 'mint' : 'red');
+
+  // Money flow
+  $id('b-fl-fees').textContent = nt(fees);
+  $id('b-fl-yoxi').textContent = nt(yoxiNetTotal);
+  $id('b-fl-meal').textContent = nt(MEAL_PP * (n + 1));
+  $id('b-fl-pts').textContent  = T + ' pts';
+  $id('b-meal-pp').textContent = MEAL_PP;
+}
+
+// Init
+aCalc();
+bCalc();
+</script>
+</body>
+</html>
